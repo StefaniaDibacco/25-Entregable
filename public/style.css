@@ -1,0 +1,16 @@
+body {
+    background-color: #eceaea
+}
+
+.text {
+    color: #008000;
+    font-style: italic;
+    word-wrap: break-word;
+  }
+  .email {
+    color: #0000FF;
+    font-weight: bold;
+  }
+  .date {
+    color: #800000;
+  }
