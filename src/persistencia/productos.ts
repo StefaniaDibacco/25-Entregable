@@ -1,5 +1,4 @@
 import { _productos } from './../services/db';
-import faker from 'faker';
 
 interface Product {
   title: string;
@@ -41,18 +40,6 @@ class Productos {
     }
   }
 
-  async post() {
-    const nuevoFake = new _productos({
-      title: faker.commerce.product(),
-      price: faker.commerce.price(),
-      thumbnail: faker.image.avatar(),
-    });
-    console.log(nuevoFake);
-    const save = await nuevoFake.save();
-    console.log(save);
-    return save;
-  }
-
   // Metodo para leer uno
   async leerUno(id: any) {
     try {
@@ -90,7 +77,7 @@ class Productos {
     try {
       return await _productos.deleteOne({ _id: id });
     } catch (error) {
-      console.log(`Producto no encontrado`, error);
+      console.log(`Producto no encontrado`);
     }
   }
 }

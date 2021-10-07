@@ -1,51 +1,28 @@
+import moment from 'moment';
 import { _mensajes } from './../services/db';
-import { normalize, schema } from 'normalizr';
-// import util from 'util';
 
-const author = new schema.Entity('author', {}, { idAttribute: 'email' });
-
-const msge = new schema.Entity(
-  'message',
-  {
-    author: author,
-  },
-  { idAttribute: '_id' }
-);
-
-const msgesSchema = new schema.Array(msge);
-
-interface Mensaje {
-  author: {
-    email: string;
-    nombre: string;
-    apellido: string;
-    alias: string;
-    edad: number;
-    avatar: string;
-  };
-  text: string;
-}
-
-export const formatMessages = (data: Mensaje) => {
+export const formatMessages = (data: { author: string; text: string }) => {
   const { author, text } = data;
   return {
     author,
     text,
+    time: moment().format('DD/MM/YYYY hh:mm:ss'),
   };
 };
+
+interface Mensaje {
+  author: string;
+  text: string;
+  time: string;
+}
+// const mensajes: Mensaje[] = [];
 
 class Mensajes {
   // funcion para leer mis mensajes
   async leer() {
     try {
-      const mensajes = (await _mensajes.find({})).map((m: any) => ({
-        _id: m._id,
-        author: m.author,
-        text: m.text,
-      }));
-      const normalizedMessages = normalize(mensajes, msgesSchema);
-      // console.log(util.inspect(normalizedMessages, true, 5, true));
-      return normalizedMessages;
+      // return mensajes;
+      return await _mensajes.find({});
     } catch (error) {
       console.log('No hay mensajes en el listado');
       return [];
@@ -53,20 +30,15 @@ class Mensajes {
   }
 
   // funcion para agregar mensajes
-  async guardar(data: Mensaje) {
+  async guardar(author: string, text: string, time: string) {
     try {
-      const nuevoMensaje = new _mensajes(data);
-      const result: any = await nuevoMensaje.save();
-      const mensajes = (await _mensajes.find({ _id: result._id })).map(
-        (m: any) => ({
-          _id: m._id,
-          author: m.author,
-          text: m.text,
-        })
-      );
-
-      const normalizedMessages = normalize(mensajes, msgesSchema);
-      return normalizedMessages;
+      const mensajeNuevo: Mensaje = {
+        author,
+        text,
+        time,
+      };
+      const nuevoMensaje = new _mensajes(mensajeNuevo);
+      return await nuevoMensaje.save();
     } catch (error) {
       console.log('ERROR: No se pudo agregar un mensaje. ' + error);
     }

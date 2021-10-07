@@ -18,8 +18,6 @@ router.post(
   productController.addProducts
 );
 
-router.post('/vista-test', productController.generar);
-
 router.put(
   '/actualizar/:id',
   [checkAdmin, productController.checkProductExists],

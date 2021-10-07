@@ -33,9 +33,9 @@ export const init = (io: any) => {
     });
 
     socket.on('new-message', async (data: any) => {
-      const formatData = formatMessages(data);
-      await mensajesPersistencia.guardar(formatData);
-      io.emit('message-update', [formatData]);
+      const { author, text, time } = formatMessages(data);
+      await mensajesPersistencia.guardar(author, text, time);
+      io.emit('message-update', [{ author, text, time }]);
     });
   });
 

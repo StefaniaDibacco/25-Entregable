@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { productsPersistencia } from '../persistencia/productos';
 
 class Producto {
-  async checkAddProducts(req: Request, res: Response, next: NextFunction) {
+  checkAddProducts(req: Request, res: Response, next: NextFunction) {
     const { title, price } = req.body;
 
     if (!title || !price || typeof title !== 'string' || isNaN(price)) {
@@ -14,11 +14,11 @@ class Producto {
     next();
   }
 
-  async checkProductExists(req: Request, res: Response, next: NextFunction) {
+  checkProductExists(req: Request, res: Response, next: NextFunction) {
     if (req.params.id) {
       const id = req.params.id;
 
-      const producto = await productsPersistencia.leerUno(id);
+      const producto = productsPersistencia.leerUno(id);
 
       if (!producto) {
         return res.status(404).json({
@@ -29,36 +29,21 @@ class Producto {
     next();
   }
 
-  async generar(req: Request, res: Response) {
-    const resultado = [];
-    const cant = req.query.cant ? Number(req.query.cant) : 10;
-
-    for (let i = 0; i < cant; i++) {
-      const prodNew = await productsPersistencia.post();
-      resultado.push(prodNew);
-    }
-
-    res.json({
-      result: 'ok',
-      data: resultado,
-    });
-  }
-
-  async getProducts(req: Request, res: Response) {
+  getProducts(req: Request, res: Response) {
     const id = Number(req.params.id);
 
     const producto = id
-      ? await productsPersistencia.leerUno(id)
-      : await productsPersistencia.leer();
+      ? productsPersistencia.leerUno(id)
+      : productsPersistencia.leer();
 
     res.json({
       data: producto,
     });
   }
 
-  async addProducts(req: Request, res: Response) {
+  addProducts(req: Request, res: Response) {
     const { title, price, thumbnail } = req.body;
-    const newItem = await productsPersistencia.guardar(title, price, thumbnail);
+    const newItem = productsPersistencia.guardar(title, price, thumbnail);
 
     res.json({
       msg: 'producto agregado con exito',
@@ -66,10 +51,10 @@ class Producto {
     });
   }
 
-  async updateProducts(req: Request, res: Response) {
+  updateProducts(req: Request, res: Response) {
     const id = Number(req.params.id);
     const { title, price, thumbnail } = req.body;
-    const newItem = await productsPersistencia.actualizar(
+    const newItem = productsPersistencia.actualizar(
       id,
       title,
       price,
@@ -81,9 +66,9 @@ class Producto {
     });
   }
 
-  async deleteProducts(req: Request, res: Response) {
-    const id = req.params.id;
-    await productsPersistencia.borrarUno(id);
+  deleteProducts(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    productsPersistencia.borrarUno(id);
     res.json({
       msg: 'producto borrado',
     });

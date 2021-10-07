@@ -1,27 +1,9 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-const { schema, denormalize } = normalizr;
-
 const socket = io.connect('http://localhost:8080', { forceNew: true });
 
-const formMensaje = document.getElementById('formMensajes');
-const mensajesContainer = document.getElementById('mensajesContainer');
-
-const author = new schema.Entity('author', {}, { idAttribute: 'email' });
-
-const msge = new schema.Entity(
-  'message',
-  {
-    author: author,
-  },
-  { idAttribute: '_id' }
-);
-
-const msgesSchema = new schema.Array(msge);
-
 socket.emit('inicio-productos');
-socket.emit('inicio-messages');
 
 socket.on('producto-update', (products) => {
   products.forEach((product) => {
@@ -48,45 +30,35 @@ const addTr = (product) => {
 function render(data) {
   console.log(data);
   const html = data
-    .map((mensaje, index) => {
+    .map((elem, index) => {
       return `<div>
-        <span class='mx-2 mensaje__email'>${mensaje.author.email}</span>
-        <span class='mx-2 mensaje__time'>${mensaje.author.nombre}</span>
-        <span class='mx-2 mensaje__text'>${mensaje.text}</span>
+      <span class="email">${elem.author}</span>
+      <span class="date"> [ ${elem.time} ]: </span>
+      <span class="text">${elem.text}</span>
      </div>`;
     })
     .join(' ');
-  document.getElementById('mensajesContainer').innerHTML += html;
+  document.getElementById('messages').innerHTML += html;
 }
 
-formMensaje.addEventListener('submit', (event) => {
-  event.preventDefault();
-  if (email.value && mensaje.value) {
-    let data = {
-      author: {
-        email: email.value,
-        nombre: nombre.value,
-        apellido: apellido.value,
-        alias: alias.value,
-        edad: edad.value,
-        avatar: avatar.value,
-      },
-      text: mensaje.value,
-    };
-    console.log('EMITIENDO SOCKET');
+const offFocus = () => {
+  console.log('perdí foco');
+  document.getElementById('messages').innerHTML = '';
+  const author = document.getElementById('username').value;
+  socket.emit('inicio-messages');
+};
 
-    socket.emit('new-message', data);
-    mensaje.value = '';
-  }
-});
+function addMessage(e) {
+  let mensaje = {
+    author: document.getElementById('username').value,
+    text: document.getElementById('texto').value,
+  };
+  document.getElementById('texto').value = '';
+  socket.emit('new-message', mensaje);
+  return false;
+}
 
-socket.on('message-update', function (normalizedData) {
-  console.log('RECIBI MENSAJE message-update', normalizedData);
-  const denormalizedData = denormalize(
-    normalizedData.result,
-    msgesSchema,
-    normalizedData.entities
-  );
-
-  render(denormalizedData);
+socket.on('message-update', function (data) {
+  console.log('RECIBI MENSAJE message-update', data);
+  render(data);
 });
