@@ -1,14 +1,11 @@
-/* eslint-disable import/no-duplicates */
-import express from 'express';
+import express, { Request, Response } from 'express';
 import handlebars from 'express-handlebars';
 import * as http from 'http';
 import routerProductos from '../routes/productos';
-//  import loginRouter from '../routes/login';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-import { Request, Response } from 'express';
 
 const app = express();
 
